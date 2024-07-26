@@ -1,6 +1,6 @@
 # SynoChatGPT
 
-ChatGPT bot on Synology Chat that runs on DSM.
+ChatGPT bot on Synology Chat.
 
 ![demo](demo.png)
 
