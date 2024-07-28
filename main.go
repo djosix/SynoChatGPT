@@ -7,11 +7,15 @@ import (
 	"synochatgpt/internal"
 )
 
+func abort(msg string, args ...any) {
+	slog.Error(msg, args...)
+	os.Exit(1)
+}
+
 func mustGetEnv(name string) string {
 	value, ok := os.LookupEnv(name)
 	if !ok {
-		slog.Error("missing env", "name", name)
-		os.Exit(1)
+		abort("missing env", "name", name)
 	}
 	return value
 }
@@ -25,7 +29,15 @@ func getEnvOr(name string, defaultValue string) string {
 }
 
 func main() {
-	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, nil)))
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: func() slog.Level {
+			var level slog.Level
+			if err := level.UnmarshalText([]byte(getEnvOr("LOG_LEVEL", "info"))); err != nil {
+				abort("invalid log level", "err", err)
+			}
+			return level
+		}(),
+	})))
 
 	http.HandleFunc("/", internal.NewHandler(
 		internal.SynoChatBot{
