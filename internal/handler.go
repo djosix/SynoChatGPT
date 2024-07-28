@@ -43,7 +43,7 @@ func NewHandler(chat SynoChatBot, api ChatGPTAPI) func(w http.ResponseWriter, r 
 		name := r.Form.Get("username")
 		text := r.Form.Get("text")
 
-		slog.Info("handle message", "name", name, "userID", userID, "text", text)
+		slog.Info("request", "name", name, "userID", userID, "text", text)
 
 		sessionMu.Lock()
 		defer sessionMu.Unlock()
@@ -80,6 +80,7 @@ func NewHandler(chat SynoChatBot, api ChatGPTAPI) func(w http.ResponseWriter, r 
 				return
 			}
 
+			slog.Debug("response", "name", name, "userID", userID, "text", text)
 			if err := chat.SendText(text, userID); err != nil {
 				slog.Error("cannot send text", "err", err)
 				return
